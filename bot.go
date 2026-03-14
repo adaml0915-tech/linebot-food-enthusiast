@@ -37,14 +37,25 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 	for _, event := range cb.Events {
 		switch e := event.(type) {
 		case webhook.MessageEvent:
+			// 注意：這行最後面的 { 必須存在
 			switch message := e.Message.(type) {
 			case webhook.TextMessageContent:
-				// 這裡直接呼叫你的 gemini 元件
 				log.Println("收到訊息:", message.Text)
+				
+				// 呼叫 Gemini
 				answer := gemini.GeminiChatComplete(message.Text)
-				if err := replyText(e.ReplyToken, answer); err != nil {
-					log.Print(err)
+				
+				// --- 強化防崩潰邏輯開始 ---
+				if answer == "" {
+					log.Println("警告: Gemini 回傳空值，可能是 API Key 或參數錯誤")
+					answer = "AI 目前沒有回應，請檢查 Gemini API Key 設定。"
 				}
+				// --- 強化防崩潰邏輯結束 ---
+
+				if err := replyText(e.ReplyToken, answer); err != nil {
+					log.Print("LINE 回傳失敗:", err)
+				}
+				
 			case webhook.StickerMessageContent:
 				replyText(e.ReplyToken, "收到你的貼圖了！")
 			}
