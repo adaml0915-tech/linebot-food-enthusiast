@@ -114,13 +114,14 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			fireDB.SetPath(fmt.Sprintf("%s/%s", DBFoodPath, uID))
 
 			switch message := e.Message.(type) {
-				// Handle only on text message
+			// Handle only on text message
 			case webhook.TextMessageContent:
 				log.Println("收到文字:", message.Text)
-				// 改成直接對話模式，避開資料庫查詢以節省時間
 				answer := gemini.GeminiChatComplete(message.Text)
 				if err := replyText(e.ReplyToken, answer); err != nil {
 					log.Print(err)
+				}
+
 			// Handle only on Sticker message
 			case webhook.StickerMessageContent:
 				var kw string
