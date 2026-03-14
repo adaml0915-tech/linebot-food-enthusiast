@@ -113,7 +113,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println("User ID:", uID)
 			fireDB.SetPath(fmt.Sprintf("%s/%s", DBFoodPath, uID))
 
-			switch message := e.Message.(type) 
+			switch message := e.Message.(type) {
 				// Handle only on text message
 			case webhook.TextMessageContent:
 				log.Println("收到文字:", message.Text)
